@@ -1,0 +1,16 @@
+version: '3'
+services:
+  directus:
+    image: directus/directus:latest
+    ports:
+      - 8055:8055
+    volumes:
+      - ./database:/directus/database
+      - ./uploads:/directus/uploads
+    environment:
+      KEY: 'replace-with-random-value'
+      SECRET: 'replace-with-random-value'
+      ADMIN_EMAIL: 'admin@example.com'
+      ADMIN_PASSWORD: 'd1r3ctu5'
+      WEBSOCKETS_ENABLED: true
+      
