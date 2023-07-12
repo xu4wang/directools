@@ -25,7 +25,7 @@ def add_operations_to_flows(flows, operations):
                 operations_objs.append(operations_dict[operation_id])
 
         # 将对应的operations对象存储在flow中的operations_obj键中
-        flow["operations_obj"] = operations_objs
+        flow["operations_obj"] = operations_objs.copy()
 
     return flows
 
@@ -68,27 +68,27 @@ def restore_flows_from_files(directory):
 
     return flows
 
-def sort_dependency_array(operations, index, sorted=[]):
-    if index >= len(operations):  # 检查索引是否超出范围
-        return sorted
+def sort_dependency_array(operations):
+    sorted_operations = []
+    visited = set()  # 用于跟踪已访问的操作
 
-    operation = operations[index]
-    if operation.get('resolve') or operation.get('reject'):
-        resolve_dependency = next((op for op in operations if op.get('id') == operation.get('resolve')), None)
-        resolve_index = operations.index(resolve_dependency) if resolve_dependency else -1
-        if resolve_dependency:
-            sorted = sort_dependency_array(operations, resolve_index, sorted)
+    def dfs(operation):
+        visited.add(operation["id"])
+        for dependency_id in [operation.get("resolve"), operation.get("reject")]:
+            if dependency_id and dependency_id not in visited:
+                dependency = next((op for op in operations if op["id"] == dependency_id), None)
+                if dependency:
+                    dfs(dependency)
+        sorted_operations.append(operation)
 
-        reject_dependency = next((op for op in operations if op.get('id') == operation.get('reject')), None)
-        reject_index = operations.index(reject_dependency) if reject_dependency else -1
-        if reject_dependency:
-            sorted = sort_dependency_array(operations, reject_index, sorted)
+    for operation in operations:
+        if operation["id"] not in visited:
+            dfs(operation)
 
-    if operation not in sorted:
-        sorted.append(operation)
-        sorted = sort_dependency_array(operations, index + 1, sorted)
+    #sorted_operations.reverse()  # 反转列表，以得到正确的顺序
+    return sorted_operations
 
-    return sorted
+
 
 
 def save_flows():
@@ -128,19 +128,20 @@ def load_flows():
                 pass
             client.post(f"/flows", json=flow)
 
-            sorted_operations = sort_dependency_array(operations, 0)
+            print("Operations:")
+            print(json.dumps(operations, indent=4))
 
-            print("Sorted operations:")
-            #请将json格式化后打印出来
+            sorted_operations = sort_dependency_array(operations)
+
+            # 请把sorted_operations  格式化后打印出来
+
+            print("Sorted Operations:")
             print(json.dumps(sorted_operations, indent=4))
 
             for operation in sorted_operations:
                 #delete operation if it's already there
                 try:
                     client.delete(f"/operations/{operation['id']}")
-                except: 
-                    pass
-                try:
                     del operation['date_created']
                     del operation['user_created']
                 except:

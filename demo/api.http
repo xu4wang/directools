@@ -7,6 +7,9 @@
 
 GET {{BASE_URL}}collections?access_token={{ADMIN_TOKEN}}
 
+###
+
+DELETE {{BASE_URL}}operations/cc1e3b57-4c8e-48f7-ad95-199550116ef2?access_token={{ADMIN_TOKEN}}
 
 ### get one
 
