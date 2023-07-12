@@ -128,15 +128,15 @@ def load_flows():
                 pass
             client.post(f"/flows", json=flow)
 
-            print("Operations:")
-            print(json.dumps(operations, indent=4))
+            #print("Operations:")
+            #print(json.dumps(operations, indent=4))
 
             sorted_operations = sort_dependency_array(operations)
 
             # 请把sorted_operations  格式化后打印出来
 
-            print("Sorted Operations:")
-            print(json.dumps(sorted_operations, indent=4))
+            #print("Sorted Operations:")
+            #print(json.dumps(sorted_operations, indent=4))
 
             for operation in sorted_operations:
                 #delete operation if it's already there

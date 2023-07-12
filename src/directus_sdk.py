@@ -107,7 +107,7 @@ class DirectusClient_V9():
             raise AssertionError(data.json()['errors'])
         if output_type == 'csv':
             return data.text
-        print(data.text)
+        #print(data.text)
         return data.json()['data']
     
     def post(self, path, **kwargs):
