@@ -5,6 +5,8 @@ import os
 
 config_obj = get_config()
 
+print(config_obj)
+
 # Create a directus client connection with user static token
 client = DirectusClient_V9(url=config_obj['directus']['url'], token=config_obj['directus']['token'])
 
@@ -66,6 +68,29 @@ def restore_flows_from_files(directory):
 
     return flows
 
+def sort_dependency_array(operations, index, sorted=[]):
+    if index >= len(operations):  # 检查索引是否超出范围
+        return sorted
+
+    operation = operations[index]
+    if operation.get('resolve') or operation.get('reject'):
+        resolve_dependency = next((op for op in operations if op.get('id') == operation.get('resolve')), None)
+        resolve_index = operations.index(resolve_dependency) if resolve_dependency else -1
+        if resolve_dependency:
+            sorted = sort_dependency_array(operations, resolve_index, sorted)
+
+        reject_dependency = next((op for op in operations if op.get('id') == operation.get('reject')), None)
+        reject_index = operations.index(reject_dependency) if reject_dependency else -1
+        if reject_dependency:
+            sorted = sort_dependency_array(operations, reject_index, sorted)
+
+    if operation not in sorted:
+        sorted.append(operation)
+        sorted = sort_dependency_array(operations, index + 1, sorted)
+
+    return sorted
+
+
 def save_flows():
     flows = client.get(f"/flows")
     operations = client.get(f"/operations")
@@ -103,11 +128,22 @@ def load_flows():
                 pass
             client.post(f"/flows", json=flow)
 
-            for operation in operations:
+            sorted_operations = sort_dependency_array(operations, 0)
+
+            print("Sorted operations:")
+            #请将json格式化后打印出来
+            print(json.dumps(sorted_operations, indent=4))
+
+            for operation in sorted_operations:
                 #delete operation if it's already there
                 try:
                     client.delete(f"/operations/{operation['id']}")
                 except: 
+                    pass
+                try:
+                    del operation['date_created']
+                    del operation['user_created']
+                except:
                     pass
                 client.post(f"/operations", json=operation)
 

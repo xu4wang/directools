@@ -1,0 +1,21 @@
+@BASE_URL = http://localhost:8055/
+@ADMIN_TOKEN = GNuG2xodzTMY19AaYh0r7yYNWSqWF-AE
+
+@json = {"amount":{"_eq":110}}
+
+###
+
+GET {{BASE_URL}}collections?access_token={{ADMIN_TOKEN}}
+
+
+### get one
+
+GET {{BASE_URL}}items/one?access_token={{ADMIN_TOKEN}}
+
+### get me
+
+GET {{BASE_URL}}users/me?access_token={{ADMIN_TOKEN}}
+
+### get server info
+
+GET {{BASE_URL}}server/info?access_token={{ADMIN_TOKEN}}
