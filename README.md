@@ -43,6 +43,9 @@ the script will try to save all the flows into a directory configured in the con
 Please make sure you set the correct url and token for dirctus, in the config.ini file.
 You can take config.ini.sample as an example.
 
+![image](https://github.com/kinnovent/directools/assets/311397/87f14b3f-6d69-4b8f-a10d-ef4f844eadb0)
+
+
 ### 2.5. Load Flows
 
 change current directory to src and run `python load_flows.py`
