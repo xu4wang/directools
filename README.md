@@ -35,7 +35,16 @@ In my case, the token is `GNuG2xodzTMY19AaYh0r7yYNWSqWF-AE`
 
 ### 2.3. Save Roles
 
-### 2.4. Load Flows
+### 2.4. Save Flows
 
-### 2.5. Save Flows
+change current directory to src and run `python save_flows.py`
 
+the script will try to save all the flows into a directory configured in the config.ini file.
+Please make sure you set the correct url and token for dirctus, in the config.ini file.
+You can take config.ini.sample as an example.
+
+### 2.5. Load Flows
+
+change current directory to src and run `python load_flows.py`
+
+the script will try to load all the flows from a directory configured in the config.ini file.
