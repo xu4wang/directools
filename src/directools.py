@@ -29,6 +29,41 @@ def add_operations_to_flows(flows, operations):
 
     return flows
 
+def add_permissions_to_roles(roles, permissions):
+
+    # 遍历roles列表，查找每个role中的permissions，并替换为对应的permissions对象
+    for role in roles:
+        permissions_objs = []  # 用于存储对应的permissions对象
+
+        # 根据role的permissions列表，查找对应的permissions对象
+        for permission in permissions:
+            if permission['role'] == role['id']:
+                permissions_objs.append(permission)
+
+        # 将对应的permissions对象存储在role中的permissions_obj键中
+        role["permissions_obj"] = permissions_objs.copy()
+
+    return roles
+
+def save_roles_to_files(roles, directory):
+    # 创建保存目录（如果不存在）
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # 遍历roles列表，将每个role保存到对应的文件中
+    for role in roles:
+        file_name = f"{role['name']}.json"  # 使用role.name作为文件名
+        file_path = os.path.join(directory, file_name)  # 拼接文件路径
+
+        # 将role对象转换为JSON格式的字符串
+        formatted_json = json.dumps(role, indent=4)
+
+        # 将JSON字符串写入文件
+        with open(file_path, 'w') as file:
+            file.write(formatted_json)
+
+        print(f"Role '{role['name']}' saved to file: {file_path}")
+
 def save_flows_to_files(flows, directory):
     # 创建保存目录（如果不存在）
     if not os.path.exists(directory):
@@ -68,6 +103,25 @@ def restore_flows_from_files(directory):
 
     return flows
 
+def restore_roles_from_files(directory):
+    roles = []
+
+    # 遍历目录中的所有文件
+    for file_name in os.listdir(directory):
+        file_path = os.path.join(directory, file_name)
+
+        # 仅处理以 .json 结尾的文件
+        if file_name.endswith(".json"):
+            # 读取文件中的JSON数据
+            with open(file_path, 'r') as file:
+                role_data = file.read()
+
+            # 解析JSON数据并添加到roles列表
+            role = json.loads(role_data)
+            roles.append(role)
+
+    return roles
+
 def sort_dependency_array(operations):
     sorted_operations = []
     visited = set()  # 用于跟踪已访问的操作
@@ -88,7 +142,19 @@ def sort_dependency_array(operations):
     #sorted_operations.reverse()  # 反转列表，以得到正确的顺序
     return sorted_operations
 
+def save_roles():
+    roles = client.get(f"/roles")
 
+    #remove role if role.name == "Administrator"
+    roles = [role for role in roles if role['name'] != "Administrator"]
+
+    permissions = client.get(f"/permissions")
+    roles = add_permissions_to_roles(roles, permissions)
+    directory = config_obj['system']['folder'] + "/roles"
+    if roles:
+        save_roles_to_files(roles, directory)
+    else:
+        print("No roles found!")
 
 
 def save_flows():
@@ -100,6 +166,32 @@ def save_flows():
         save_flows_to_files(flows, directory)
     else:
         print("No flows found!")
+
+def load_roles():
+    directory = config_obj['system']['folder'] + "/roles"
+    roles = restore_roles_from_files(directory)
+    if roles:
+        for role in roles:
+            print("Loading "+role['name'])
+            permissions = role['permissions_obj']
+            del role['permissions_obj']
+            #delete role if it's already there
+            try:
+                client.delete(f"/roles/{role['id']}")
+            except:
+                pass
+            client.post(f"/roles", json=role)
+
+            #delete permissions for the role if they're already there
+            for permission in permissions:
+                try:
+                    client.delete(f"/permissions/{permission['id']}")
+                except:
+                    pass
+
+            #add permissions to role
+            for permission in permissions:
+                client.post(f"/permissions", json=permission)
 
 def load_flows():
     directory = config_obj['system']['folder'] + "/flows"

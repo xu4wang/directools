@@ -33,7 +33,11 @@ In my case, the token is `GNuG2xodzTMY19AaYh0r7yYNWSqWF-AE`
 
 ### 2.2. Load Roles
 
+change current directory to src and run `python load_roles.py`
+
 ### 2.3. Save Roles
+
+change current directory to src and run `python save_roles.py`
 
 ### 2.4. Save Flows
 
