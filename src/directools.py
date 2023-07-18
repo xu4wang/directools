@@ -56,7 +56,7 @@ def save_roles_to_files(roles, directory):
         file_path = os.path.join(directory, file_name)  # 拼接文件路径
 
         # 将role对象转换为JSON格式的字符串
-        formatted_json = json.dumps(role, indent=4)
+        formatted_json = json.dumps(role, ensure_ascii=False, indent=4)
 
         # 将JSON字符串写入文件
         with open(file_path, 'w') as file:
@@ -75,7 +75,7 @@ def save_flows_to_files(flows, directory):
         file_path = os.path.join(directory, file_name)  # 拼接文件路径
 
         # 将flow对象转换为JSON格式的字符串
-        formatted_json = json.dumps(flow, indent=4)
+        formatted_json = json.dumps(flow, ensure_ascii=False, indent=4)
 
         # 将JSON字符串写入文件
         with open(file_path, 'w') as file:
@@ -192,6 +192,7 @@ def load_roles():
             #add permissions to role
             for permission in permissions:
                 client.post(f"/permissions", json=permission)
+
 
 def load_flows():
     directory = config_obj['system']['folder'] + "/flows"
