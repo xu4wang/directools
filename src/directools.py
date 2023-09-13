@@ -158,8 +158,10 @@ def save_roles():
 
 
 def save_flows():
-    flows = client.get(f"/flows")
-    operations = client.get(f"/operations")
+    flows = client.get(f"/flows", params={"limit": "10000"})
+    print(len(flows))
+    operations = client.get(f"/operations", params={"limit": "10000"})
+    print(len(operations))
     flows = add_operations_to_flows(flows, operations)
     directory = config_obj['system']['folder'] + "/flows"
     if flows:
@@ -193,7 +195,57 @@ def load_roles():
             for permission in permissions:
                 client.post(f"/permissions", json=permission)
 
+def load_flow( name ):
+    directory = config_obj['system']['folder'] + "/flows"
+    flows = restore_flows_from_files(directory)
+    if flows:
+        for flow in flows:
+            if flow['name'] == name:
+                print("Loading "+flow['name'])
+                operations = flow['operations_obj']
+                
+                # "operation": null,
+                #"date_created": "2023-07-12T05:55:44",
+                #"user_created": "0a743283-dd90-4c7f-a13c-96c41d071e74",
+                #"operations": [],
+                #"operations_obj": []
+                #
+                #del flow['operation']
+                del flow['date_created']
+                del flow['user_created']
+                del flow['operations']
+                del flow['operations_obj']
 
+                #delete flow if it's already there
+                try:
+                    client.delete(f"/flows/{flow['id']}")
+                except:
+                    pass
+                client.post(f"/flows", json=flow)
+
+                #print("Operations:")
+                #print(json.dumps(operations, indent=4))
+
+                sorted_operations = sort_dependency_array(operations)
+
+                # 请把sorted_operations  格式化后打印出来
+
+                #print("Sorted Operations:")
+                #print(json.dumps(sorted_operations, indent=4))
+
+                for operation in sorted_operations:
+                    #delete operation if it's already there
+                    try:
+                        client.delete(f"/operations/{operation['id']}")
+                        del operation['date_created']
+                        del operation['user_created']
+                    except:
+                        pass
+                    client.post(f"/operations", json=operation)
+
+    else:  
+        print("No flows found!")
+  
 def load_flows():
     directory = config_obj['system']['folder'] + "/flows"
     flows = restore_flows_from_files(directory)
