@@ -5,9 +5,6 @@ token = "32Qj2q_1-dBaUxxx-Z-fm1oGRmujaXVt"
 src_url = "http://localhost:8055"
 src_token = "32Qj2q_1-dBaUxxx-Z-fm1oGRmujaXVt"
 
-# dst_url = "http://localhost:8055"
-# dst_token = "32Qj2q_1-dBaUxxx-Z-fm1oGRmujaXVt"
-
 dst_url = "https://b2b-dev-api.ksher.cn"
 dst_token = "xK0kDEGxAJaSSLK2Xyjnb7IqvgNRJIdc"
 
@@ -26,6 +23,10 @@ flow_list = [
 "Business：Withdraw确认"
 ]
 
+folder = "/Users/austin/Documents/coding/b2b-backend/export"
+
+################################### No need to change below this line ######################################################
+
 config_data = {
     "directus": {
         "url": url,
@@ -37,7 +38,7 @@ config_data = {
         "flow_list": flow_list
     },
         "system": {
-           "folder": "../demo",
+           "folder": folder,
     }
 }
 
