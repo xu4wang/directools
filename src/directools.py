@@ -249,8 +249,13 @@ def load_flow( name ):
 def load_flows():
     directory = config_obj['system']['folder'] + "/flows"
     flows = restore_flows_from_files(directory)
+    flow_list = config_obj['directus']['flow_list']
+
     if flows:
         for flow in flows:
+            if flow['name'] not in flow_list:
+                continue  # 跳过不在 flow_list 中的流程
+
             print("Loading "+flow['name'])
             operations = flow['operations_obj']
             
@@ -295,3 +300,37 @@ def load_flows():
 
     else:  
         print("No flows found!")
+
+def save_flows_in_list():
+    flows = client.get(f"/flows", params={"limit": "10000"})
+    print(len(flows))
+    operations = client.get(f"/operations", params={"limit": "10000"})
+    print(len(operations))
+    flows = add_operations_to_flows(flows, operations)
+    directory = config_obj['system']['folder'] + "/flows"
+    
+    # 过滤只包含在 flow_list 中的流程
+    flow_list = config_obj['directus']['flow_list']
+    flows = [flow for flow in flows if flow.get('name') in flow_list]
+    
+    if flows:
+        save_flows_to_files(flows, directory)
+    else:
+        print("No matching flows found!")
+
+
+def deploy_flows():
+    #initiate client
+    url = config_obj['directus']['src_url']
+    token = config_obj['directus']['src_token']
+    print(url,token)
+    global client 
+    client = DirectusClient_V9(url=url, token=token)
+    save_flows_in_list()
+    # delete client and re-initiate a new one
+    url = config_obj['directus']['dst_url']
+    token = config_obj['directus']['dst_token']
+    print(url,token)
+
+    client = DirectusClient_V9(url=url, token=token)
+    load_flows()

@@ -1,51 +1,45 @@
-import configparser
 
-config_file_path = "./config.ini"
+url = "http://localhost:8055"
+token = "32Qj2q_1-dBaUxxx-Z-fm1oGRmujaXVt"
 
-def read_config_file(file_path):
-    # 创建配置解析器对象
-    config = configparser.ConfigParser()
+src_url = "http://localhost:8055"
+src_token = "32Qj2q_1-dBaUxxx-Z-fm1oGRmujaXVt"
 
-    # 读取配置文件
-    try:
-        config.read(file_path)
-    except configparser.Error:
-        # 配置文件不存在或格式不正确时，返回默认配置
-        return get_default_config()
+# dst_url = "http://localhost:8055"
+# dst_token = "32Qj2q_1-dBaUxxx-Z-fm1oGRmujaXVt"
 
-    # 获取特定配置项的值
-    directus_url = config.get("directus", "url", fallback="http://localhost:8055")
-    directus_token = config.get("directus", "token", fallback="MISSING ADMIN TOKEN in config.ini!")
-    folder = config.get("system", "folder", fallback="./")
+dst_url = "https://b2b-dev-api.ksher.cn"
+dst_token = "xK0kDEGxAJaSSLK2Xyjnb7IqvgNRJIdc"
 
-    # 检查配置项是否为空，如果为空则返回默认配置
-    if not directus_url or not directus_token:
-        return get_default_config()
+flow_list = [
+"Business INT FX下单",
+"Business INT FX取消",
+"Business INT FX确认",
+"Business INT Rate Query",
+"Business INT 同币种提现下单",
+"Business: Rate Query",
+"Business：FX下单",
+"Business：FX取消",
+"Business：FX确认",
+"Business：Withdraw下单",
+"Business：Withdraw取消",
+"Business：Withdraw确认"
+]
 
-    # 创建一个字典来存储配置项的值
-    config_data = {
-        "directus": {
-            "url": directus_url,
-            "token": directus_token,
-        },
+config_data = {
+    "directus": {
+        "url": url,
+        "token": token,
+        "src_url": src_url,
+        "src_token": src_token,
+        "dst_url": dst_url,
+        "dst_token": dst_token,
+        "flow_list": flow_list
+    },
         "system": {
-            "folder": folder,
-        }
+           "folder": "../demo",
     }
-
-    return config_data
-
-def get_default_config():
-    # 默认配置
-    return {
-        "directus": {
-            "url": "http://localhost:8055",
-            "token": "GNuG2xodzTMY19AaYh0r7yYNWSqWF-AE",
-        },
-        "system": {
-            "folder": "./",
-        }
-    }
+}
 
 def get_config():
-    return read_config_file(config_file_path)
+    return config_data
