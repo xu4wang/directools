@@ -75,7 +75,7 @@ def save_flows_to_files(flows, directory):
         file_path = os.path.join(directory, file_name)  # 拼接文件路径
 
         # 将flow对象转换为JSON格式的字符串
-        formatted_json = json.dumps(flow, ensure_ascii=False, indent=4)
+        formatted_json = json.dumps(flow, ensure_ascii=False, indent=4, sort_keys=True)
 
         # 将JSON字符串写入文件
         with open(file_path, 'w') as file:
@@ -318,6 +318,52 @@ def save_flows_in_list():
     else:
         print("No matching flows found!")
 
+def save_all_flows():
+    flows = client.get(f"/flows", params={"limit": "10000"})
+    operations = client.get(f"/operations", params={"limit": "10000"})
+    flows = add_operations_to_flows(flows, operations)
+    directory = config_obj['system']['folder'] + "/flows"
+        
+    if flows:
+        save_flows_to_files(flows, directory)
+    else:
+        print("No matching flows found!")
+
+def load_all_flows():
+    directory = config_obj['system']['folder'] + "/flows"
+    flows = restore_flows_from_files(directory)
+    flow_list = config_obj['directus']['flow_list']
+
+    if flows:
+        for flow in flows:
+            print("Loading "+flow['name'])
+            operations = flow['operations_obj']
+            del flow['date_created']
+            del flow['user_created']
+            del flow['operations']
+            del flow['operations_obj']
+
+            #delete flow if it's already there
+            try:
+                client.delete(f"/flows/{flow['id']}")
+            except:
+                pass
+            client.post(f"/flows", json=flow)
+
+            sorted_operations = sort_dependency_array(operations)
+
+            for operation in sorted_operations:
+                #delete operation if it's already there
+                try:
+                    client.delete(f"/operations/{operation['id']}")
+                    del operation['date_created']
+                    del operation['user_created']
+                except:
+                    pass
+                client.post(f"/operations", json=operation)
+
+    else:  
+        print("No flows found!")
 
 def deploy_flows():
     #initiate client
@@ -334,3 +380,34 @@ def deploy_flows():
 
     client = DirectusClient_V9(url=url, token=token)
     load_flows()
+
+def pull_flows():
+    #initiate client
+    url = config_obj['directus']['dst_url']
+    token = config_obj['directus']['dst_token']
+    print(url,token)
+    global client 
+    client = DirectusClient_V9(url=url, token=token)
+    save_flows_in_list()
+
+    # delete client and re-initiate a new one
+    url = config_obj['directus']['src_url']
+    token = config_obj['directus']['src_token']
+    print(url,token)
+
+    client = DirectusClient_V9(url=url, token=token)
+    load_flows()
+
+def download_all_flows():
+    global client 
+
+    #initiate client
+    url = config_obj['directus']['dst_url']
+    token = config_obj['directus']['dst_token']
+    client = DirectusClient_V9(url=url, token=token)
+    save_all_flows()
+
+    url = config_obj['directus']['src_url']
+    token = config_obj['directus']['src_token']
+    client = DirectusClient_V9(url=url, token=token)
+    load_all_flows()

@@ -14,13 +14,17 @@ flow_list = [
 "Business INT FX确认",
 "Business INT Rate Query",
 "Business INT 同币种提现下单",
-"Business: Rate Query",
+"Business INT do withdraw",
+"Business INT do withdraw confirm",
 "Business：FX下单",
 "Business：FX取消",
 "Business：FX确认",
 "Business：Withdraw下单",
 "Business：Withdraw取消",
-"Business：Withdraw确认"
+"Business：Withdraw确认",
+"test funclibrary",
+"Business：Withdraw撤销",
+"Business: TEST"
 ]
 
 folder = "/Users/austin/Documents/coding/b2b-backend/export"
