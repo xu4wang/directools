@@ -16,12 +16,18 @@ def add_operations_to_flows(flows, operations):
 
     # 遍历flows列表，查找每个flow中的operations，并替换为对应的operations对象
     for flow in flows:
+        del flow["date_created"]
+        del flow["user_created"]
+
         flow_operations = flow.get("operations", [])  # 获取当前flow的operations列表
         operations_objs = []  # 用于存储对应的operations对象
 
         # 根据flow的operations列表，查找对应的operations对象
         for operation_id in flow_operations:
             if operation_id in operations_dict:
+                del operations_dict[operation_id]["date_created"]
+                del operations_dict[operation_id]["user_created"]
+
                 operations_objs.append(operations_dict[operation_id])
 
         # 将对应的operations对象存储在flow中的operations_obj键中
@@ -266,8 +272,8 @@ def load_flows():
             #"operations_obj": []
             #
             #del flow['operation']
-            del flow['date_created']
-            del flow['user_created']
+            #del flow['date_created']
+            #del flow['user_created']
             del flow['operations']
             del flow['operations_obj']
 
@@ -338,8 +344,6 @@ def load_all_flows():
         for flow in flows:
             print("Loading "+flow['name'])
             operations = flow['operations_obj']
-            del flow['date_created']
-            del flow['user_created']
             del flow['operations']
             del flow['operations_obj']
 
