@@ -103,7 +103,7 @@ class DirectusClient_V9():
             verify=self.verify,
             **kwargs
         )
-        if 'errors' in data.text:
+        if 'errors' in data:
             raise AssertionError(data.json()['errors'])
         if output_type == 'csv':
             return data.text

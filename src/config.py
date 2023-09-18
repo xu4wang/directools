@@ -23,9 +23,27 @@ flow_list = [
 "Business：Withdraw取消",
 "Business：Withdraw确认",
 "test funclibrary",
-"Business：Withdraw撤销",
-"Business: TEST"
+"wallet-test",
+"Order Declaration for Payout China",
+"Business：Withdraw撤销"
 ]
+
+""" "Business INT FX下单",
+"Business INT FX取消",
+"Business INT FX确认",
+"Business INT Rate Query",
+"Business INT 同币种提现下单",
+"Business INT do withdraw",
+"Business INT do withdraw confirm",
+"Business：FX下单",
+"Business：FX取消",
+"Business：FX确认",
+"Business：Withdraw下单",
+"Business：Withdraw取消",
+"Business：Withdraw确认",
+"test funclibrary",
+"wallet-test",
+"Business：Withdraw撤销", """
 
 folder = "/Users/austin/Documents/coding/b2b-backend/export"
 
